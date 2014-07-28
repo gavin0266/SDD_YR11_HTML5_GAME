@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta <meta charset="utf-8">
+	<title>Bouncing Balls</title>
+	<style type="text/css" media="screen">
+		* {margin: 0px; padding: 0px;}
+		html,body {width:100%; height: 100% }
+	</style>
+	<script type="text/javascript" src="jquery-1.11.1.min.js"></script>
+	<script type="text/javascript">
+		window.onload = function(){
+			var ctx;
+			var gravity = 4;
+			var forceFactor = 0.3;
+			var mouseDown = false;
+			var balls = new Array();
+			var mousePos = new Array();
+
+			function onMouseDown(evt){
+				mouseDown = true;
+				mousePos['downX'] = evt.pageX;
+				mousePos['downY'] = evt.pageY;
+			}
+
+			function onMouseUp(evt){
+				mouseDown = false;
+				balls.push(new ball(
+					mousePos["downX"], 
+					mousePos["downY"], 
+					(evt.pageX - mousePos["downX"]) * forceFactor, 
+					(evt.pageY - mousePos["downY"]) * forceFactor, 
+					5+(Math.random()*10),
+					0.75, 
+					random_color()
+					));
+			}
+
+			function onMouseMove (evt) {
+				mousePos['currentX'] = evt.posX;
+				mousePos['currentY'] = evt.posY;
+			}
+
+			function resizeWindow (evt) {
+				// body...
+				canvas.height = $(window).height();
+				canvas.width = $(window).width();
+			}
+
+			$(document).mousedown(onMouseDown);
+			$(document).mouseup(onMouseUp);
+			$(document).mousemove(onMouseMove);
+			$(window).bind("resize",resizeWindow);
+
+			function circle (x, y, r, c) {
+				// body...
+				ctx.beginPath();
+				ctx.arc(x, y, r, 0, Math.PI*2, true);
+				ctx.closePath();
+
+				ctx.fillStyle = c;
+				ctx.fill();
+
+				ctx.lineWidth = r * 0.1;
+				ctx.strokeStyle = "#000000";
+				ctx.stroke();
+			}
+
+			function random_color () {
+				// body...
+				color = "#"+((1<<24)*Math.random()|0).toString(16);
+				return color;
+			}
+
+			function draw_ball () {
+				// body...
+				this.vy += gravity * 0.1;
+				this.x += this.vx * 0.1;
+				this.y += this.vy * 0.1;
+
+				if(this.x + this.r > canvas.width){
+					this.x = canvas.width - this.r;
+					this.vx *= -1 * this.b;
+				}
+				if (this.x - this.r < 0) {
+					this.x = this.r;
+					this.vx *= -1 * this.b;
+				}
+				if(this.y + this.r > canvas.height){
+					this.y = canvas.height - this.r;
+					this.vy *= -1 * this.b;
+				}
+				if (this.y - this.r < 0) {
+					this.y = this.r;
+					this.vy *= -1 * this.b;
+				}
+
+				circle(this.x, this.y, this.r, this.c);
+
+			}
+
+			function ball (posX, posY, velX, velY, radius, bounciness, color) {
+				// body...
+				this.x = posX;
+				this.y = posY;
+				this.vx = velX;
+				this.vy = velY;
+				this.r = radius;
+				this.b = bounciness;
+				this.c = color
+
+				this.draw = draw_ball;
+			}
+
+			function game_loop () {
+				// body...
+				ctx.clearRect(0,0,canvas.width, canvas.height);
+
+				if(mouseDown == true){
+
+				}
+				for(var i = 0; i < balls.length; i++){
+					balls[i].draw();
+				}
+
+				ctx.fillStyle = "#000000";
+				ctx.font = "28px Arial";
+				ctx.fillText("Balls: " + balls.length, 10, canvas.height - 10);
+
+			}
+			function init () {
+				// body...
+				ctx = $('#canvas')[0].getContext("2d");
+				canvas.height = $(window).height();
+				canvas.width = $(window).width();
+				return setInterval(game_loop, 10);
+			}
+			init();
+
+
+		}
+	</script>
+</head>
+<body style="overflow: hidden">
+	<canvas id="canvas">
+
+	</canvas>
+
+	<script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
+</body>
+</html>
